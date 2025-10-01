@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 
 namespace PEAKGreenScreen
 {
-    [BepInPlugin("PEAKGreenScreen", "Green Screen", "1.3.0")]
+    [BepInDependency("tony4twentys.Airport_Remixed", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("com.atomic.greenscreen", "PEAK Green Screen", "1.4.0")]
     public class Plugin : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
@@ -26,6 +27,8 @@ namespace PEAKGreenScreen
         public static ConfigEntry<float> frontRightSpotAngle;
         public static ConfigEntry<bool> frontRightLightActive;
 
+        public static bool isAirportRemixedLoaded = false;
+
         public static AssetBundle LightBundle;
 
         private Light frontLeftLight;
@@ -33,6 +36,8 @@ namespace PEAKGreenScreen
         private Renderer greenScreenRenderer1;
         private Renderer greenScreenRenderer2;
         private Renderer greenScreenRenderer3;
+
+        private Renderer greenScreenRenderer4;
 
         private string CurrentScene = "";
 
@@ -42,7 +47,17 @@ namespace PEAKGreenScreen
             Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
             DontDestroyOnLoad(this);
 
-           
+            CheckMod("tony4twentys.Airport_Remixed", ref isAirportRemixedLoaded);
+
+            if (isAirportRemixedLoaded)
+            {
+                Logger.LogInfo("Airport Remixed is loaded, applying compatibility settings.");
+            }
+            else
+            {
+                Logger.LogInfo("Airport Remixed is not loaded. Resume normal behavior.");
+            }
+
             configColorR = Config.Bind("General", "ColorR", 0.0f, "Red value for custom color (0-255).");
             configColorG = Config.Bind("General", "ColorG", 255.0f, "Green value for custom color (0-255).");
             configColorB = Config.Bind("General", "ColorB", 0.0f, "Blue value for custom color (0-255).");
@@ -113,9 +128,19 @@ namespace PEAKGreenScreen
                 Material material = new Material(Shader.Find("Unlit/Color"));
                 Material material2 = new Material(Shader.Find("W/Peak_Standard"));
 
-                greenScreenRenderer1 = CreateCube(new Vector3(-6.3764f, 3.94f, 122.8569f), new Vector3(0.0073f, 6.9709f, 15.1f), Quaternion.Euler(0f, 90f, 0f), material, "GreenScreenPart1");
-                greenScreenRenderer2 = CreateCube(new Vector3(-6.3764f, -1.76f, 122.4569f), new Vector3(16.6818f, 4.6709f, 15.1f), Quaternion.Euler(0f, 90f, 0f), material, "GreenScreenPart2");
-                greenScreenRenderer3 = CreateCube(new Vector3(-6.3764f, 3.94f, 122.8669f), new Vector3(0.0073f, 6.9709f, 15.1f), Quaternion.Euler(0f, 90f, 0f), material2, "GreenScreenPart3");
+                if (!isAirportRemixedLoaded)
+                {
+                    greenScreenRenderer1 = CreateCube(new Vector3(-6.3764f, 3.94f, 122.8569f), new Vector3(0.0073f, 6.9709f, 15.1f), Quaternion.Euler(0f, 90f, 0f), material, "GreenScreenPart1");
+                    greenScreenRenderer2 = CreateCube(new Vector3(-6.3764f, -1.76f, 122.4569f), new Vector3(16.6818f, 4.6709f, 15.1f), Quaternion.Euler(0f, 90f, 0f), material, "GreenScreenPart2");
+                    greenScreenRenderer3 = CreateCube(new Vector3(-6.3764f, 3.94f, 122.8669f), new Vector3(0.0073f, 6.9709f, 15.1f), Quaternion.Euler(0f, 90f, 0f), material2, "GreenScreenPart3");
+                }
+                else
+                {
+                    greenScreenRenderer1 = CreateCube(new Vector3(-27.8256f, 8.2482f, 48.777f), new Vector3(0.0073f, 15.1564f, 22.1709f), Quaternion.Euler(0f, 90f, 0f), material, "GreenScreenPart1");
+                    greenScreenRenderer2 = CreateCube(new Vector3(-27.6983f, -1.44f, 41.3118f), new Vector3(14.9472f, 4.6709f, 21.911f), Quaternion.Euler(0f, 90f, 0f), material, "GreenScreenPart2");
+                    greenScreenRenderer3 = CreateCube(new Vector3(-27.8256f, 8.2482f, 48.778f), new Vector3(0.0073f, 15.1564f, 22.1709f), Quaternion.Euler(0f, 90f, 0f), material2, "GreenScreenPart3");
+                    greenScreenRenderer4 = CreateCube(new Vector3(-38.6728f, 8.2482f, 44.9271f), new Vector3(0.4073f, 15.1564f, 22.1709f), Quaternion.Euler(0f, 0f, 0f), material, "GreenScreenPart4");
+                }
 
                 Destroy(GameObject.Find("fence (17)"));
                 Destroy(GameObject.Find("fence (16)"));
@@ -135,9 +160,17 @@ namespace PEAKGreenScreen
                     Logger.LogError("Failed to load LightTexture from the asset bundle.");
                 }
 
-                frontLeftLight = CreateLight(new Vector3(-2.0073f, 1.7926f, 113.8106f), new Vector3(0.5f, 0.5f, 0.5f), Quaternion.Euler(0f, 50.3132f, 180f), "GreenScreenLight1", lightMaterial);
-                frontRightLight = CreateLight(new Vector3(-10.6891f, 1.7926f, 113.8106f), new Vector3(0.5f, 0.5f, 0.5f), Quaternion.Euler(0f, 130.4433f, 180f), "GreenScreenLight2", lightMaterial);
-
+                if (!isAirportRemixedLoaded)
+                {
+                    frontLeftLight = CreateLight(new Vector3(-2.0073f, 1.7926f, 113.8106f), new Vector3(0.5f, 0.5f, 0.5f), Quaternion.Euler(0f, 50.3132f, 180f), "GreenScreenLight1", lightMaterial);
+                    frontRightLight = CreateLight(new Vector3(-10.6891f, 1.7926f, 113.8106f), new Vector3(0.5f, 0.5f, 0.5f), Quaternion.Euler(0f, 130.4433f, 180f), "GreenScreenLight2", lightMaterial);
+                }
+                else
+                {
+                    frontLeftLight = CreateLight(new Vector3(-20.8874f, 2.0162f, 33.4678f), new Vector3(0.5f, 0.5f, 0.5f), Quaternion.Euler(0f, 50.3132f, 180f), "GreenScreenLight1", lightMaterial);
+                    frontRightLight = CreateLight(new Vector3(-34.7994f, 2.0226f, 33.4846f), new Vector3(0.5f, 0.5f, 0.5f), Quaternion.Euler(0f, 130.4433f, 180f), "GreenScreenLight2", lightMaterial);
+                }
+                
                 UpdateObjects();
             }
         }
@@ -161,6 +194,12 @@ namespace PEAKGreenScreen
             greenScreenRenderer2.material.color = customColor;
             greenScreenRenderer2.material.SetColor("_EmissionColor", customColor * 10f);
             greenScreenRenderer3.material.SetColor("_BaseColor", customColor);
+
+            if (greenScreenRenderer4 != null)
+            {
+                greenScreenRenderer4.material.color = customColor;
+                greenScreenRenderer4.material.SetColor("_EmissionColor", customColor * 10f);
+            }
 
             if (frontLeftLight != null)
             {
@@ -228,6 +267,12 @@ namespace PEAKGreenScreen
 
             part.name = Name;
             return renderer;
+        }
+
+        public void CheckMod(string modGUID, ref bool loaded)
+        {
+            BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue(modGUID, out var pluginInfo);
+            loaded = pluginInfo != null;
         }
     }
 }
