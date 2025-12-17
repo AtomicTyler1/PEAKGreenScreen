@@ -18,6 +18,7 @@ namespace PEAKGreenScreen
         public static ConfigEntry<float> configColorG;
         public static ConfigEntry<float> configColorB;
         public static ConfigEntry<bool> sunLighting;
+        public static ConfigEntry<bool> disableFestiveAirport;
 
         public static ConfigEntry<float> frontLeftIntensity;
         public static ConfigEntry<float> frontLeftSpotAngle;
@@ -36,8 +37,9 @@ namespace PEAKGreenScreen
         private Renderer greenScreenRenderer1;
         private Renderer greenScreenRenderer2;
         private Renderer greenScreenRenderer3;
-
         private Renderer greenScreenRenderer4;
+
+        private GameObject holidayAirport;
 
         private string CurrentScene = "";
 
@@ -62,6 +64,7 @@ namespace PEAKGreenScreen
             configColorG = Config.Bind("General", "ColorG", 255.0f, "Green value for custom color (0-255).");
             configColorB = Config.Bind("General", "ColorB", 0.0f, "Blue value for custom color (0-255).");
             sunLighting = Config.Bind("General", "SunLighting", true, "If set to false, in the airport the sun won't have any lighting effects, good for getting that perfect shot.");
+            disableFestiveAirport = Config.Bind("General", "Disable Festive Airport", false, "If set to true, disables the festive decorations in the airport (if they are present), this can be toggled in game.");
 
             frontLeftIntensity = Config.Bind("Front Left Light", "FL Intensity", 1.0f, "Intensity of the front left light.");
             frontLeftSpotAngle = Config.Bind("Front Left Light", "FL SpotAngle", 120f, "Spot angle of the front left light.");
@@ -74,6 +77,7 @@ namespace PEAKGreenScreen
             configColorR.SettingChanged += OnConfigSettingChanged;
             configColorG.SettingChanged += OnConfigSettingChanged;
             configColorB.SettingChanged += OnConfigSettingChanged;
+            disableFestiveAirport.SettingChanged += OnConfigSettingChanged;
             frontLeftIntensity.SettingChanged += OnConfigSettingChanged;
             frontLeftSpotAngle.SettingChanged += OnConfigSettingChanged;
             frontLeftLightActive.SettingChanged += OnConfigSettingChanged;
@@ -87,7 +91,12 @@ namespace PEAKGreenScreen
 
             sunLighting.SettingChanged += (sender, args) =>
             {
-                if (CurrentScene == "Airport")
+                if (GameObject.Find("BL_Holiday"))
+                {
+                    GameObject day = GameObject.Find("SpecialDay Airport (1)");
+                    day.transform.Find("Directional Light").gameObject.SetActive(sunLighting.Value);
+                }
+                else
                 {
                     GameObject day = GameObject.Find("SpecialDay Airport");
                     day.transform.Find("Directional Light").gameObject.SetActive(sunLighting.Value);
@@ -122,8 +131,19 @@ namespace PEAKGreenScreen
             CurrentScene = scene.name;
             if (scene.name == "Airport")
             {
-                GameObject day = GameObject.Find("SpecialDay Airport");
-                day.transform.Find("Directional Light").gameObject.SetActive(sunLighting.Value);
+                if (GameObject.Find("BL_Holiday"))
+                {
+                    GameObject day = GameObject.Find("SpecialDay Airport (1)");
+                    day.transform.Find("Directional Light").gameObject.SetActive(sunLighting.Value);
+
+                    holidayAirport = GameObject.Find("BL_Holiday");
+                    holidayAirport.SetActive(!disableFestiveAirport.Value);
+                }
+                else
+                {
+                    GameObject day = GameObject.Find("SpecialDay Airport");
+                    day.transform.Find("Directional Light").gameObject.SetActive(sunLighting.Value);
+                }
 
                 Material material = new Material(Shader.Find("Unlit/Color"));
                 Material material2 = new Material(Shader.Find("W/Peak_Standard"));
@@ -180,6 +200,12 @@ namespace PEAKGreenScreen
             configColorR.Value = Mathf.Clamp(configColorR.Value, 0f, 255f);
             configColorG.Value = Mathf.Clamp(configColorG.Value, 0f, 255f);
             configColorB.Value = Mathf.Clamp(configColorB.Value, 0f, 255f);
+
+            if (sender == disableFestiveAirport && holidayAirport != null)
+            {
+                holidayAirport.SetActive(!disableFestiveAirport.Value);
+            }
+
             if (greenScreenRenderer1 != null && frontLeftLight != null)
             {
                 UpdateObjects();

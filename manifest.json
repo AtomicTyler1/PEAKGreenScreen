@@ -1,0 +1,9 @@
+{
+    "name": "Green_Screen",
+    "version_number": "1.4.1",
+    "website_url": "https://discord.com/channels/1363179626435707082/1415739173289332776",
+    "description": "Adds a green screen to PEAK. Includes custom colors and Aiport Remixed support!",
+    "dependencies": [
+        "BepInEx-BepInExPack_PEAK-5.4.75301"
+    ]
+}
