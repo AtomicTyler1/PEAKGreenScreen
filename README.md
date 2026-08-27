@@ -13,7 +13,7 @@ The 10 configs are as follows:
 - ColorG (Default: 255)
 - ColorB (Default: 0)
 - SunLighting (Default: True/On)
-- Disable Festive Airport (Default: False/Off)
+- Side Walls (Default: True/On)
 ## Front Left Light
 - FL Intensity (Default: 1.0f)
 - FL SpotAngle (Default: 120f)

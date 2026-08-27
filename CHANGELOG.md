@@ -1,4 +1,12 @@
 <details>
+<summary> v1.5.0 - Bug fix & Feature </summary>
+
+- The green screen now works for the latest version
+- Added a new side walls config that can be toggled.
+
+</details>
+
+<details>
 <summary> v1.4.1 - Bug fix </summary>
 
 - New config to temp disable the festive decorations
